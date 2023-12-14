@@ -20,13 +20,42 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(isDirect = true) {
+    this.isDirect = isDirect;
+    this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(message, key) {
+    if (message === undefined || key === undefined) {
+      throw new Error('Incorrect arguments!');
+    }
+    return this.reverseMachine(message, key, true);
+  }
+
+  decrypt(encryptedMessage, key) {
+    if (encryptedMessage === undefined || key === undefined) {
+      throw new Error('Incorrect arguments!');
+    }
+    return this.reverseMachine(encryptedMessage, key, false);
+  }
+
+  reverseMachine(message, key, isEncrypt) {
+    let result = '';
+    key = key.toUpperCase();
+    for (let i = 0, j = 0; i < message.length; i++) {
+      const currentChar = message[i].toUpperCase();
+      const index = this.alphabet.indexOf(currentChar);
+      if (index === -1) {
+        result += currentChar;
+        continue;
+      }
+      const keyChar = key[j % key.length];
+      const keyIndex = this.alphabet.indexOf(keyChar);
+      const shiftedIndex = isEncrypt ? (index + keyIndex) % 26 : (index - keyIndex + 26) % 26;
+      result += this.alphabet[shiftedIndex];
+      j++;
+    }
+    return this.isDirect ? result : result.split('').reverse().join('');
   }
 }
 
